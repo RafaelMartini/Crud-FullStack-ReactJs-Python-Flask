@@ -1,9 +1,9 @@
-import GlobalStyle from "./styles/global";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import axios from "./axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "./axiosConfig";
+import GlobalStyle from "./styles/global";
 
 const Container = styled.div`
   width: 100%;
@@ -16,6 +16,40 @@ const Container = styled.div`
 `;
 
 const Title = styled.h2``;
+
+const UserItem = styled.li`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const AddButton = styled.button`
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const EditButton = styled.button`
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -42,7 +76,7 @@ function App() {
 
   useEffect(() => {
     getUsers();
-  }, [setUsers]);
+  }, []);
 
   return (
     <>
@@ -50,13 +84,21 @@ function App() {
         <Title>Pessoas</Title>
         <ul>
           {users.map((user) => (
-            <li key={user.id}>
-              {user.nome} - {user.dataAdmissao}
-              <button onClick={() => setOnEdit(user)}>Editar</button>
-              <button onClick={() => handleDelete(user.id)}>Excluir</button>
-            </li>
+            <UserItem key={user.id}>
+              <UserInfo>
+                <div>Nome: {user.nome.split(" ")[0]}</div>
+                <div>Data de Admissão: {formatDateBr(user.dataAdmissao)}</div>
+              </UserInfo>
+              <ButtonsContainer>
+                <EditButton onClick={() => setOnEdit(user)}>Editar</EditButton>
+                <button onClick={() => handleDelete(user.id)}>Excluir</button>
+              </ButtonsContainer>
+            </UserItem>
           ))}
         </ul>
+        <AddButton onClick={() => setOnEdit(null)}>
+          Adicionar Registro
+        </AddButton>
       </Container>
       <ToastContainer autoClose={5000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
@@ -65,3 +107,8 @@ function App() {
 }
 
 export default App;
+
+const formatDateBr = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("pt-BR");
+};

@@ -1,7 +1,5 @@
-// UpdatePerson.js
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 
 const UpdatePerson = () => {
   const { id } = useParams();
@@ -10,21 +8,8 @@ const UpdatePerson = () => {
 
   useEffect(() => {
     // Faça uma solicitação à API para obter os detalhes da pessoa com o ID fornecido
-    axios
-      .get(`http://localhost:5000/pessoas/${id}`)
-      .then((response) => {
-        setPerson(response.data);
-        setFormData({
-          nome: response.data.nome,
-          rg: response.data.rg,
-          cpf: response.data.cpf,
-          dataNascimento: response.data.dataNascimento,
-          dataAdmissao: response.data.dataAdmissao,
-        });
-      })
-      .catch((error) => {
-        console.error("Erro ao obter detalhes da pessoa:", error);
-      });
+    // Atualize o estado "person" com os dados da API
+    // Preencha o estado "formData" com os dados do "person"
   }, [id]);
 
   const handleFormChange = (e) => {
@@ -36,16 +21,8 @@ const UpdatePerson = () => {
   };
 
   const handleUpdate = () => {
-    // Faça uma solicitação à API para atualizar os dados da pessoa
-    axios
-      .put(`http://localhost:5000/pessoas/${id}`, formData)
-      .then(() => {
-        console.log("Dados da pessoa atualizados com sucesso");
-        // Redirecione para a página de detalhes da pessoa após a atualização
-      })
-      .catch((error) => {
-        console.error("Erro ao atualizar os dados da pessoa:", error);
-      });
+    // Faça uma solicitação à API para atualizar os dados da pessoa com o ID fornecido
+    // Redirecione para a página "SelectedPerson" após a atualização
   };
 
   return (
@@ -99,7 +76,7 @@ const UpdatePerson = () => {
             />
           </div>
           <button onClick={handleUpdate}>Salvar Alterações</button>
-          <Link to={`/person/${id}`}>Cancelar</Link>
+          <Link to={`/selected/${id}`}>Cancelar</Link>
         </div>
       ) : (
         <p>Carregando...</p>

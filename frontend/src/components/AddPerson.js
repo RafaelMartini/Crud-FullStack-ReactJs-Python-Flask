@@ -1,7 +1,5 @@
-// AddPerson.js
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 const AddPerson = () => {
   const [formData, setFormData] = useState({});
@@ -16,15 +14,7 @@ const AddPerson = () => {
 
   const handleAdd = () => {
     // Faça uma solicitação à API para adicionar uma nova pessoa
-    axios
-      .post("http://localhost:5000/pessoas<int:id>", formData)
-      .then(() => {
-        console.log("Nova pessoa adicionada com sucesso");
-        // Redirecione para a página de listagem após a adição
-      })
-      .catch((error) => {
-        console.error("Erro ao adicionar nova pessoa:", error);
-      });
+    // Redirecione para a página "Index" após a adição
   };
 
   return (
