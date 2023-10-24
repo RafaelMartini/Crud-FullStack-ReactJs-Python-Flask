@@ -1,2 +1,3 @@
 # config.py
-DATABASE_URI = 'mysql+mysqlconnector://root:1234@localhost:3306/banco'
+DATABASE_URI = 'mysql+mysqlconnector://rafaelmartini:cmFmYWVsbWFy@jobs.visie.com.br:3306/rafaelmartini'
+
