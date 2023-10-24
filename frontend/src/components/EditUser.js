@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "../axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useParams, Link } from "react-router-dom";
+import GlobalStyle from "../styles/global";
 
 const Container = styled.div`
   width: 100%;
@@ -45,22 +45,26 @@ const ButtonGroup = styled.div`
   gap: 10px;
 `;
 
-function EditUser() {
-  const [user, setUser] = useState({ nome: "", dataAdmissao: "" });
-  const { id } = useParams();
+function EditUser({ match, history }) {
+  const userId = match.params.id;
+  const [user, setUser] = useState({
+    nome: "",
+    rg: "",
+    cpf: "",
+    dataNascimento: "",
+    dataAdmissao: "",
+  });
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/pessoas/${id}`);
-        setUser(response.data);
-      } catch (error) {
-        toast.error("Erro ao buscar usuário.");
-      }
-    };
-
-    getUser();
-  }, [id]);
+  const getUserDetails = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/pessoas/${userId}`);
+      setUser(res.data);
+    } catch (error) {
+      toast.error("Erro ao carregar os detalhes do usuário.");
+      history.push("/"); // Redirecionar para a página inicial em caso de erro.
+      console.log("Erro ao carregar detalhes:", error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,26 +74,59 @@ function EditUser() {
     });
   };
 
-  const handleUpdate = async (e) => {
+  const handleEditUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/pessoas/${id}`, user);
-      toast.success("Usuário atualizado com sucesso.");
+      await axios.put(`http://localhost:5000/pessoas/${userId}`, user);
+      toast.success("Usuário editado com sucesso.");
+      history.push("/"); // Redirecionar para a página inicial após a edição bem-sucedida.
     } catch (error) {
-      toast.error("Erro ao atualizar usuário.");
+      toast.error("Erro ao editar o usuário.");
+      console.log("Erro ao editar o usuário:", error);
     }
   };
+
+  useEffect(() => {
+    getUserDetails();
+  }, []);
 
   return (
     <Container>
       <Title>Editar Usuário</Title>
-      <Form onSubmit={handleUpdate}>
+      <Form onSubmit={handleEditUser}>
         <FormGroup>
           <Label>Nome:</Label>
           <Input
             type="text"
             name="nome"
             value={user.nome}
+            onChange={handleInputChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>RG:</Label>
+          <Input
+            type="text"
+            name="rg"
+            value={user.rg}
+            onChange={handleInputChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>CPF:</Label>
+          <Input
+            type="text"
+            name="cpf"
+            value={user.cpf}
+            onChange={handleInputChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>Data de Nascimento:</Label>
+          <Input
+            type="text"
+            name="dataNascimento"
+            value={user.dataNascimento}
             onChange={handleInputChange}
           />
         </FormGroup>
@@ -103,11 +140,11 @@ function EditUser() {
           />
         </FormGroup>
         <ButtonGroup>
-          <button type="submit">Salvar</button>
-          <Link to="/">Cancelar</Link>
+          <button type="submit">Salvar Alterações</button>
         </ButtonGroup>
       </Form>
       <ToastContainer autoClose={5000} position={toast.POSITION.BOTTOM_LEFT} />
+      <GlobalStyle />
     </Container>
   );
 }

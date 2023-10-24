@@ -4,6 +4,8 @@ import axios from "./axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GlobalStyle from "./styles/global";
+import Popup from "reactjs-popup"; // Importe o Popup
+import EditUser from "./components/EditUser";
 
 const Container = styled.div`
   width: 100%;
@@ -54,6 +56,7 @@ const EditButton = styled.button`
 function App() {
   const [users, setUsers] = useState([]);
   const [onEdit, setOnEdit] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const getUsers = async () => {
     try {
@@ -64,6 +67,11 @@ function App() {
     }
   };
 
+  const formatDateBr = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("pt-BR");
+  };
+
   const handleDelete = async (userId) => {
     try {
       await axios.delete(`http://localhost:5000/pessoas/${userId}`);
@@ -72,6 +80,11 @@ function App() {
     } catch (error) {
       toast.error("Erro ao excluir a pessoa.");
     }
+  };
+
+  const handleEdit = (userToEdit) => {
+    setOnEdit(userToEdit);
+    setShowModal(true);
   };
 
   useEffect(() => {
@@ -90,7 +103,7 @@ function App() {
                 <div>Data de Admissão: {formatDateBr(user.dataAdmissao)}</div>
               </UserInfo>
               <ButtonsContainer>
-                <EditButton onClick={() => setOnEdit(user)}>Editar</EditButton>
+                <EditButton onClick={() => handleEdit(user)}>Editar</EditButton>
                 <button onClick={() => handleDelete(user.id)}>Excluir</button>
               </ButtonsContainer>
             </UserItem>
@@ -100,6 +113,20 @@ function App() {
           Adicionar Registro
         </AddButton>
       </Container>
+
+      {/* Use o componente Popup para criar o modal */}
+      <Popup
+        open={showModal}
+        closeOnDocumentClick
+        onClose={() => setShowModal(false)}
+      >
+        <div>
+          {onEdit && (
+            <EditUser user={onEdit} closeModal={() => setShowModal(false)} />
+          )}
+        </div>
+      </Popup>
+
       <ToastContainer autoClose={5000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
     </>
@@ -107,8 +134,3 @@ function App() {
 }
 
 export default App;
-
-const formatDateBr = (dateStr) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("pt-BR");
-};
