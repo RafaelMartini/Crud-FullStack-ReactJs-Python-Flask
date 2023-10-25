@@ -4,44 +4,40 @@ import axios from "./axiosConfig";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GlobalStyle from "./styles/global";
-import Popup from "reactjs-popup"; // Importe o Popup
-import EditUser from "./components/EditUser";
 
 const Container = styled.div`
   width: 100%;
   max-width: 800px;
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const Title = styled.h2``;
+const Title = styled.h2`
+  font-size: 24px;
+  margin-bottom: 20px;
+`;
+
+const UserList = styled.ul`
+  list-style: none;
+  padding: 0;
+`;
 
 const UserItem = styled.li`
+  border: 1px solid #ddd;
+  background-color: #fff;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
 const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const AddButton = styled.button`
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+  flex: 1;
 `;
 
 const EditButton = styled.button`
@@ -51,12 +47,31 @@ const EditButton = styled.button`
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 10px;
+`;
+
+const DeleteButton = styled.button`
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+const AddButton = styled.button`
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
 `;
 
 function App() {
   const [users, setUsers] = useState([]);
-  const [onEdit, setOnEdit] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
   const getUsers = async () => {
     try {
@@ -83,8 +98,32 @@ function App() {
   };
 
   const handleEdit = (userToEdit) => {
-    setOnEdit(userToEdit);
-    setShowModal(true);
+    setEditingUser(userToEdit);
+  };
+
+  const handleUserEditChange = (field, value) => {
+    setEditingUser({
+      ...editingUser,
+      [field]: value,
+    });
+  };
+
+  const handleSaveEdit = async (editedUser) => {
+    try {
+      await axios.put(
+        `http://localhost:5000/pessoas/${editedUser.id}`,
+        editedUser
+      );
+      setEditingUser(null);
+      getUsers();
+      toast.success("Pessoa editada com sucesso.");
+    } catch (error) {
+      toast.error("Erro ao editar a pessoa.");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUser(null);
   };
 
   useEffect(() => {
@@ -92,44 +131,62 @@ function App() {
   }, []);
 
   return (
-    <>
-      <Container>
-        <Title>Pessoas</Title>
-        <ul>
-          {users.map((user) => (
-            <UserItem key={user.id}>
+    <Container>
+      <Title>Pessoas</Title>
+      <UserList>
+        {users.map((user) => (
+          <UserItem key={user.id}>
+            {editingUser && editingUser.id === user.id ? (
+              <div>
+                <div>
+                  <input
+                    type="text"
+                    value={editingUser.nome}
+                    onChange={(e) =>
+                      handleUserEditChange("nome", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    value={editingUser.dataAdmissao}
+                    onChange={(e) =>
+                      handleUserEditChange("dataAdmissao", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <EditButton onClick={() => handleSaveEdit(editingUser)}>
+                    Salvar
+                  </EditButton>
+                  <DeleteButton onClick={handleCancelEdit}>
+                    Cancelar
+                  </DeleteButton>
+                </div>
+              </div>
+            ) : (
               <UserInfo>
                 <div>Nome: {user.nome.split(" ")[0]}</div>
                 <div>Data de Admissão: {formatDateBr(user.dataAdmissao)}</div>
               </UserInfo>
-              <ButtonsContainer>
-                <EditButton onClick={() => handleEdit(user)}>Editar</EditButton>
-                <button onClick={() => handleDelete(user.id)}>Excluir</button>
-              </ButtonsContainer>
-            </UserItem>
-          ))}
-        </ul>
-        <AddButton onClick={() => setOnEdit(null)}>
-          Adicionar Registro
-        </AddButton>
-      </Container>
-
-      {/* Use o componente Popup para criar o modal */}
-      <Popup
-        open={showModal}
-        closeOnDocumentClick
-        onClose={() => setShowModal(false)}
-      >
-        <div>
-          {onEdit && (
-            <EditUser user={onEdit} closeModal={() => setShowModal(false)} />
-          )}
-        </div>
-      </Popup>
+            )}
+            <div>
+              <EditButton onClick={() => handleEdit(user)}>Editar</EditButton>
+              <DeleteButton onClick={() => handleDelete(user.id)}>
+                Excluir
+              </DeleteButton>
+            </div>
+          </UserItem>
+        ))}
+      </UserList>
+      <AddButton onClick={() => setEditingUser(null)}>
+        Adicionar Registro
+      </AddButton>
 
       <ToastContainer autoClose={5000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
-    </>
+    </Container>
   );
 }
 
