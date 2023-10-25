@@ -161,7 +161,6 @@ function App() {
   const handleAddNewUser = async () => {
     try {
       const res = await axios.post("http://localhost:5000/pessoas", newUser);
-      setUsers([...users, res.data]);
       setNewUser({
         nome: "",
         rg: "",
@@ -170,6 +169,7 @@ function App() {
         dataAdmissao: "",
       });
       toast.success("Pessoa adicionada com sucesso.");
+      getUsers(); // Chame getUsers para atualizar a lista após adicionar um novo usuário
     } catch (error) {
       toast.error("Erro ao adicionar a pessoa.");
     }
