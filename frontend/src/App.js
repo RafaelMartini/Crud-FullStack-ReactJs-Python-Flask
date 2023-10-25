@@ -98,6 +98,16 @@ const AddUserButton = styled.button`
   width: 100%;
 `;
 
+const ToggleAddUserFormButton = styled.button`
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+`;
+
 function App() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
@@ -108,6 +118,7 @@ function App() {
     dataNascimento: "",
     dataAdmissao: "",
   });
+  const [isAddUserFormVisible, setIsAddUserFormVisible] = useState(false);
 
   const getUsers = async () => {
     try {
@@ -169,10 +180,14 @@ function App() {
         dataAdmissao: "",
       });
       toast.success("Pessoa adicionada com sucesso.");
-      getUsers(); // Chame getUsers para atualizar a lista após adicionar um novo usuário
+      getUsers();
     } catch (error) {
       toast.error("Erro ao adicionar a pessoa.");
     }
+  };
+
+  const handleToggleAddUserForm = () => {
+    setIsAddUserFormVisible(!isAddUserFormVisible);
   };
 
   useEffect(() => {
@@ -182,61 +197,69 @@ function App() {
   return (
     <Container>
       <Title>Pessoas</Title>
-      <AddUserForm>
-        <AddUserHeader>Adicionar Nova Pessoa</AddUserHeader>
-        <div>
-          <AddUserLabel htmlFor="nome">Nome:</AddUserLabel>
-          <AddUserInput
-            type="text"
-            id="nome"
-            value={newUser.nome}
-            onChange={(e) => setNewUser({ ...newUser, nome: e.target.value })}
-          />
-        </div>
-        <div>
-          <AddUserLabel htmlFor="rg">RG:</AddUserLabel>
-          <AddUserInput
-            type="text"
-            id="rg"
-            value={newUser.rg}
-            onChange={(e) => setNewUser({ ...newUser, rg: e.target.value })}
-          />
-        </div>
-        <div>
-          <AddUserLabel htmlFor="cpf">CPF:</AddUserLabel>
-          <AddUserInput
-            type="text"
-            id="cpf"
-            value={newUser.cpf}
-            onChange={(e) => setNewUser({ ...newUser, cpf: e.target.value })}
-          />
-        </div>
-        <div>
-          <AddUserLabel htmlFor="dataNascimento">
-            Data de Nascimento:
-          </AddUserLabel>
-          <AddUserInput
-            type="text"
-            id="dataNascimento"
-            value={newUser.dataNascimento}
-            onChange={(e) =>
-              setNewUser({ ...newUser, dataNascimento: e.target.value })
-            }
-          />
-        </div>
-        <div>
-          <AddUserLabel htmlFor="dataAdmissao">Data de Admissão:</AddUserLabel>
-          <AddUserInput
-            type="text"
-            id="dataAdmissao"
-            value={newUser.dataAdmissao}
-            onChange={(e) =>
-              setNewUser({ ...newUser, dataAdmissao: e.target.value })
-            }
-          />
-        </div>
-        <AddUserButton onClick={handleAddNewUser}>Adicionar</AddUserButton>
-      </AddUserForm>
+      <ToggleAddUserFormButton onClick={handleToggleAddUserForm}>
+        {isAddUserFormVisible ? "Ocultar Formulário" : "Adicionar Nova Pessoa"}
+      </ToggleAddUserFormButton>
+
+      {isAddUserFormVisible && (
+        <AddUserForm>
+          <AddUserHeader>Adicionar Nova Pessoa</AddUserHeader>
+          <div>
+            <AddUserLabel htmlFor="nome">Nome:</AddUserLabel>
+            <AddUserInput
+              type="text"
+              id="nome"
+              value={newUser.nome}
+              onChange={(e) => setNewUser({ ...newUser, nome: e.target.value })}
+            />
+          </div>
+          <div>
+            <AddUserLabel htmlFor="rg">RG:</AddUserLabel>
+            <AddUserInput
+              type="text"
+              id="rg"
+              value={newUser.rg}
+              onChange={(e) => setNewUser({ ...newUser, rg: e.target.value })}
+            />
+          </div>
+          <div>
+            <AddUserLabel htmlFor="cpf">CPF:</AddUserLabel>
+            <AddUserInput
+              type="text"
+              id="cpf"
+              value={newUser.cpf}
+              onChange={(e) => setNewUser({ ...newUser, cpf: e.target.value })}
+            />
+          </div>
+          <div>
+            <AddUserLabel htmlFor="dataNascimento">
+              Data de Nascimento:
+            </AddUserLabel>
+            <AddUserInput
+              type="text"
+              id="dataNascimento"
+              value={newUser.dataNascimento}
+              onChange={(e) =>
+                setNewUser({ ...newUser, dataNascimento: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <AddUserLabel htmlFor="dataAdmissao">
+              Data de Admissão:
+            </AddUserLabel>
+            <AddUserInput
+              type="text"
+              id="dataAdmissao"
+              value={newUser.dataAdmissao}
+              onChange={(e) =>
+                setNewUser({ ...newUser, dataAdmissao: e.target.value })
+              }
+            />
+          </div>
+          <AddUserButton onClick={handleAddNewUser}>Adicionar</AddUserButton>
+        </AddUserForm>
+      )}
 
       <UserList>
         {users.map((user) => (
@@ -244,7 +267,8 @@ function App() {
             {editingUser && editingUser.id === user.id ? (
               <div>
                 <div>
-                  <input
+                  <AddUserLabel htmlFor="nome">Nome:</AddUserLabel>
+                  <AddUserInput
                     type="text"
                     value={editingUser.nome}
                     onChange={(e) =>
@@ -253,7 +277,40 @@ function App() {
                   />
                 </div>
                 <div>
-                  <input
+                  <AddUserLabel htmlFor="rg">RG:</AddUserLabel>
+                  <AddUserInput
+                    type="text"
+                    value={editingUser.rg}
+                    onChange={(e) => handleUserEditChange("rg", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <AddUserLabel htmlFor="cpf">CPF:</AddUserLabel>
+                  <AddUserInput
+                    type="text"
+                    value={editingUser.cpf}
+                    onChange={(e) =>
+                      handleUserEditChange("cpf", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <AddUserLabel htmlFor="dataNascimento">
+                    Data de Nascimento:
+                  </AddUserLabel>
+                  <AddUserInput
+                    type="text"
+                    value={editingUser.dataNascimento}
+                    onChange={(e) =>
+                      handleUserEditChange("dataNascimento", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <AddUserLabel htmlFor="dataAdmissao">
+                    Data de Admissão:
+                  </AddUserLabel>
+                  <AddUserInput
                     type="text"
                     value={editingUser.dataAdmissao}
                     onChange={(e) =>
@@ -273,6 +330,9 @@ function App() {
             ) : (
               <UserInfo>
                 <div>Nome: {user.nome.split(" ")[0]}</div>
+                {/* <div>RG: {user.rg}</div>
+                <div>CPF: {user.cpf}</div>
+                <div>Data de Nascimento: {user.dataNascimento}</div> */}
                 <div>Data de Admissão: {formatDateBr(user.dataAdmissao)}</div>
               </UserInfo>
             )}
