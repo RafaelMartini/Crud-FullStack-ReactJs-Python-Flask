@@ -59,19 +59,55 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-const AddButton = styled.button`
+const AddUserForm = styled.div`
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const AddUserHeader = styled.h2`
+  font-size: 20px;
+  margin: 10px 0;
+`;
+
+const AddUserLabel = styled.label`
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+`;
+
+const AddUserInput = styled.input`
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 100%;
+`;
+
+const AddUserButton = styled.button`
   background-color: #3498db;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 10px;
+  width: 100%;
 `;
 
 function App() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
+  const [newUser, setNewUser] = useState({
+    nome: "",
+    rg: "",
+    cpf: "",
+    dataNascimento: "",
+    dataAdmissao: "",
+  });
 
   const getUsers = async () => {
     try {
@@ -122,8 +158,21 @@ function App() {
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingUser(null);
+  const handleAddNewUser = async () => {
+    try {
+      const res = await axios.post("http://localhost:5000/pessoas", newUser);
+      setUsers([...users, res.data]);
+      setNewUser({
+        nome: "",
+        rg: "",
+        cpf: "",
+        dataNascimento: "",
+        dataAdmissao: "",
+      });
+      toast.success("Pessoa adicionada com sucesso.");
+    } catch (error) {
+      toast.error("Erro ao adicionar a pessoa.");
+    }
   };
 
   useEffect(() => {
@@ -133,6 +182,62 @@ function App() {
   return (
     <Container>
       <Title>Pessoas</Title>
+      <AddUserForm>
+        <AddUserHeader>Adicionar Nova Pessoa</AddUserHeader>
+        <div>
+          <AddUserLabel htmlFor="nome">Nome:</AddUserLabel>
+          <AddUserInput
+            type="text"
+            id="nome"
+            value={newUser.nome}
+            onChange={(e) => setNewUser({ ...newUser, nome: e.target.value })}
+          />
+        </div>
+        <div>
+          <AddUserLabel htmlFor="rg">RG:</AddUserLabel>
+          <AddUserInput
+            type="text"
+            id="rg"
+            value={newUser.rg}
+            onChange={(e) => setNewUser({ ...newUser, rg: e.target.value })}
+          />
+        </div>
+        <div>
+          <AddUserLabel htmlFor="cpf">CPF:</AddUserLabel>
+          <AddUserInput
+            type="text"
+            id="cpf"
+            value={newUser.cpf}
+            onChange={(e) => setNewUser({ ...newUser, cpf: e.target.value })}
+          />
+        </div>
+        <div>
+          <AddUserLabel htmlFor="dataNascimento">
+            Data de Nascimento:
+          </AddUserLabel>
+          <AddUserInput
+            type="text"
+            id="dataNascimento"
+            value={newUser.dataNascimento}
+            onChange={(e) =>
+              setNewUser({ ...newUser, dataNascimento: e.target.value })
+            }
+          />
+        </div>
+        <div>
+          <AddUserLabel htmlFor="dataAdmissao">Data de Admissão:</AddUserLabel>
+          <AddUserInput
+            type="text"
+            id="dataAdmissao"
+            value={newUser.dataAdmissao}
+            onChange={(e) =>
+              setNewUser({ ...newUser, dataAdmissao: e.target.value })
+            }
+          />
+        </div>
+        <AddUserButton onClick={handleAddNewUser}>Adicionar</AddUserButton>
+      </AddUserForm>
+
       <UserList>
         {users.map((user) => (
           <UserItem key={user.id}>
@@ -160,7 +265,7 @@ function App() {
                   <EditButton onClick={() => handleSaveEdit(editingUser)}>
                     Salvar
                   </EditButton>
-                  <DeleteButton onClick={handleCancelEdit}>
+                  <DeleteButton onClick={() => setEditingUser(null)}>
                     Cancelar
                   </DeleteButton>
                 </div>
@@ -180,10 +285,6 @@ function App() {
           </UserItem>
         ))}
       </UserList>
-      <AddButton onClick={() => setEditingUser(null)}>
-        Adicionar Registro
-      </AddButton>
-
       <ToastContainer autoClose={5000} position={toast.POSITION.BOTTOM_LEFT} />
       <GlobalStyle />
     </Container>
