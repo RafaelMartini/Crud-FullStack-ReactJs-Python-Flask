@@ -73,4 +73,4 @@ npm start
   http://localhost:3000/
 ```
 
-https://github.com/RafaelMartini/Crud-FullStack-ReactJs-Python-Flask/blob/main/frontend.png?raw=true
+![Exemplo de Imagem](https://github.com/RafaelMartini/Crud-FullStack-ReactJs-Python-Flask/blob/main/frontend.png?raw=true)
